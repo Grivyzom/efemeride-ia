@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Code History Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="src/assets/css/index_style.css">
+</head>
+<body class="animated-bg min-h-screen terminal-font select-none overflow-hidden">
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+    <nav class="glass border-b" style="border-bottom-color: rgba(23,105,54,0.3);">
+        <div class="flex justify-between items-center max-w-6xl mx-auto p-4">
+            <div class="flex items-center space-x-4">
+                <span class="text-primary font-bold">code-history v0.1.0</span>
+            </div>
+            <div class="text-accent text-sm" id="datetime">
+                <span id="current-time"></span>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto p-6 relative z-10">
+        <div class="glass rounded-lg p-8 max-w-md mx-auto mt-8" style="background-color:#0e1111;">
+            <h2 class="text-primary text-2xl mb-4">Iniciar Sesión</h2>
+            <form class="space-y-4">
+                <div>
+                    <label class="block text-accent mb-1" for="email">Correo electrónico</label>
+                    <input id="email" type="email" class="w-full p-2 rounded bg-panel border border-primary text-primary" placeholder="usuario@example.com">
+                </div>
+                <div>
+                    <label class="block text-accent mb-1" for="password">Contraseña</label>
+                    <input id="password" type="password" class="w-full p-2 rounded bg-panel border border-primary text-primary" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary px-4 py-2 rounded w-full hover-glow">Acceder</button>
+            </form>
+            <p class="text-center text-muted mt-4">¿No tienes cuenta? <a href="register.html" class="text-primary underline">Regístrate</a></p>
+        </div>
+    </div>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { hour12: false });
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            setInterval(() => {
+                if (document.querySelectorAll('.particle').length < 15) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 4 + 1;
+                    const left = Math.random() * 100;
+                    const animationDuration = Math.random() * 10 + 10;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = left + '%';
+                    particle.style.animationDuration = animationDuration + 's';
+                    container.appendChild(particle);
+                    setTimeout(() => {
+                        if (container.contains(particle)) {
+                            container.removeChild(particle);
+                        }
+                    }, animationDuration * 1000);
+                }
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            createParticles();
+        });
+    </script>
+</body>
+</html>
