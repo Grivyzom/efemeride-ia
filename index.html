@@ -1,1 +1,161 @@
-# Página principal
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code History Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="src/assets/css/index_style.css">
+    <script href="src/assets/js/utils.js"></script>
+</head>
+<body class="animated-bg min-h-screen terminal-font select-none overflow-hidden">
+    <!-- Partículas flotantes -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+    
+    <!-- Navbar -->
+    <nav class="glass border-b border-green-500/20 p-4 relative z-10">
+        <div class="flex justify-between items-center max-w-6xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <span class="text-green-400 font-bold">code-history v0.1.0</span>
+            </div>
+            <div class="text-green-300 text-sm" id="datetime">
+                <span id="current-time"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="container mx-auto p-6 relative z-10">
+        <div class="glass rounded-lg p-8 max-w-4xl mx-auto mt-8">
+            
+            <!-- Terminal prompt -->
+            <div class="mb-6">
+                <div class="text-green-400 mb-2">
+                    <span class="text-green-500">user@mouredev:</span><span class="text-blue-400">~</span> ./code-history --day
+                </div>
+                
+                <!-- Loading animation -->
+                <div id="loading" class="space-y-2 mb-6">
+                    <div class="text-green-300 flex items-center">
+                        <span class="mr-2">●</span>
+                        <span class="typing" style="animation-delay: 0s;">Iniciando sistema de efemérides de programación...</span>
+                    </div>
+                    <div class="text-green-300 flex items-center" style="animation-delay: 1s;">
+                        <span class="mr-2">●</span>
+                        <span class="typing" style="animation-delay: 1.5s;">Conectando con la base de datos... [OK]</span>
+                    </div>
+                    <div class="text-green-300 flex items-center" style="animation-delay: 2s;">
+                        <span class="mr-2">●</span>
+                        <span class="typing" style="animation-delay: 2.5s;">Cargando datos históricos... [OK]</span>
+                    </div>
+                    <div class="text-green-300 flex items-center" style="animation-delay: 3s;">
+                        <span class="mr-2">●</span>
+                        <span class="typing" style="animation-delay: 3.5s;">Sistema listo. Descubre la historia de la programación día a día.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fecha actual -->
+            <div class="glass rounded border border-green-500/30 p-4 mb-6" id="date-container" style="display: none;">
+                <div class="flex items-center text-green-400">
+                    <span class="mr-2">📅</span>
+                    <span id="current-date"></span>
+                </div>
+            </div>
+
+            <!-- Efeméride del día -->
+            <div class="glass rounded-lg border border-green-500/30 p-6 relative" id="ephemeris-container" style="display: none;">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-green-400 text-xl font-bold flex items-center">
+                        <span class="mr-2">&lt;/&gt;</span>
+                        EFEMÉRIDE DEL DÍA
+                    </h2>
+                    <button 
+                        id="copy-btn" 
+                        class="bg-green-600/20 hover:bg-green-600/40 border border-green-500/50 text-green-300 px-3 py-1 rounded text-sm hover-glow transition-all duration-300 flex items-center space-x-2"
+                    >
+                        <span>📋</span>
+                        <span>Compartir</span>
+                    </button>
+                </div>
+                
+                <div id="ephemeris-content" class="space-y-4">
+                    <div class="text-green-300 font-bold" id="ephemeris-date"></div>
+                    <div class="text-green-100 leading-relaxed" id="ephemeris-text"></div>
+                </div>
+            </div>
+
+            <!-- Terminal prompt final -->
+            <div class="mt-8 flex items-center" id="final-prompt" style="display: none;">
+                <span class="text-green-500">user@mouredev:</span><span class="text-blue-400">~</span>
+                <span class="cursor ml-2"></span>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8 text-green-600 text-sm" id="footer" style="display: none;">
+                <div class="mb-2">← Pulsa CTRL+W para salir →</div>
+                <div>© 2025 MoureDev by Brais Moure</div>
+                <div class="text-green-500 mt-2">Desarrollado con ❤️ desde Galicia para el mundo</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Efemérides de programación por fecha
+        const ephemerides = {
+            "01-01": {
+                year: "1983",
+                event: "ARPANET adopta oficialmente el protocolo TCP/IP, estableciendo los fundamentos de Internet tal como lo conocemos hoy."
+            },
+            "07-21": {
+                year: "1969",
+                event: "El 20 de julio de 1969, el módulo lunar Eagle del Apollo 11 aterrizó en la Luna, utilizando el software de navegación desarrollado por Margaret Hamilton y su equipo en el MIT, un hito en la programación y la tecnología espacial."
+            },
+            "01-03": {
+                year: "1977",
+                event: "Apple Computer Company se incorpora oficialmente, marcando el inicio de una revolución en la computación personal."
+            },
+            "02-14": {
+                year: "1946",
+                event: "Se presenta públicamente ENIAC, una de las primeras computadoras electrónicas de propósito general."
+            },
+            "03-12": {
+                year: "1989",
+                event: "Tim Berners-Lee envía la propuesta para la World Wide Web en el CERN, revolucionando la forma de compartir información."
+            },
+            "04-04": {
+                year: "1975",
+                event: "Microsoft es fundada por Bill Gates y Paul Allen en Albuquerque, Nuevo México."
+            },
+            "05-23": {
+                year: "1995",
+                event: "Sun Microsystems lanza Java, un lenguaje de programación que cambiaría el desarrollo de software para siempre."
+            },
+            "06-15": {
+                year: "1991",
+                event: "Linus Torvalds anuncia el desarrollo de Linux en un newsgroup de Minix, iniciando la revolución del software libre."
+            },
+            "08-12": {
+                year: "1981",
+                event: "IBM lanza su primera computadora personal (IBM PC), estableciendo el estándar para las PCs modernas."
+            },
+            "09-04": {
+                year: "1998",
+                event: "Google es fundado por Larry Page y Sergey Brin, revolucionando la búsqueda en Internet."
+            },
+            "10-05": {
+                year: "2011",
+                event: "Steve Jobs, cofundador de Apple y visionario de la tecnología, fallece dejando un legado imborrable en la informática."
+            },
+            "11-20": {
+                year: "1985",
+                event: "Microsoft lanza Windows 1.0, introduciendo la interfaz gráfica de usuario a las masas."
+            },
+            "12-23": {
+                year: "1947",
+                event: "John Bardeen, Walter Brattain y William Shockley inventan el transistor en Bell Labs, la base de toda la electrónica moderna."
+            }
+        };
+    </script>
+</body>
+</html>
