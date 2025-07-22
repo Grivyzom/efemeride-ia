@@ -202,127 +202,59 @@
                 <div class="mb-2">← Pulsa CTRL+W para salir →</div>
                 <div>© 2025 MoureDev by Brais Moure</div>
                 <div class="text-accent mt-2">Desarrollado con ❤️ desde Galicia para el mundo</div>
-            </div>
-        </div>
+            }</n        }
     </div>
 
     <script>
-        // Efemérides de programación por fecha
-        const ephemerides = {
-            "01-01": {
-                year: "1983",
-                event: "ARPANET adopta oficialmente el protocolo TCP/IP, estableciendo los fundamentos de Internet tal como lo conocemos hoy."
-            },
-            "07-21": {
-                year: "1969",
-                event: "El 20 de julio de 1969, el módulo lunar Eagle del Apollo 11 aterrizó en la Luna, utilizando el software de navegación desarrollado por Margaret Hamilton y su equipo en el MIT, un hito en la programación y la tecnología espacial."
-            },
-            "01-03": {
-                year: "1977",
-                event: "Apple Computer Company se incorpora oficialmente, marcando el inicio de una revolución en la computación personal."
-            },
-            "02-14": {
-                year: "1946",
-                event: "Se presenta públicamente ENIAC, una de las primeras computadoras electrónicas de propósito general."
-            },
-            "03-12": {
-                year: "1989",
-                event: "Tim Berners-Lee envía la propuesta para la World Wide Web en el CERN, revolucionando la forma de compartir información."
-            },
-            "04-04": {
-                year: "1975",
-                event: "Microsoft es fundada por Bill Gates y Paul Allen en Albuquerque, Nuevo México."
-            },
-            "05-23": {
-                year: "1995",
-                event: "Sun Microsystems lanza Java, un lenguaje de programación que cambiaría el desarrollo de software para siempre."
-            },
-            "06-15": {
-                year: "1991",
-                event: "Linus Torvalds anuncia el desarrollo de Linux en un newsgroup de Minix, iniciando la revolución del software libre."
-            },
-            "08-12": {
-                year: "1981",
-                event: "IBM lanza su primera computadora personal (IBM PC), estableciendo el estándar para las PCs modernas."
-            },
-            "09-04": {
-                year: "1998",
-                event: "Google es fundado por Larry Page y Sergey Brin, revolucionando la búsqueda en Internet."
-            },
-            "10-05": {
-                year: "2011",
-                event: "Steve Jobs, cofundador de Apple y visionario de la tecnología, fallece dejando un legado imborrable en la informática."
-            },
-            "11-20": {
-                year: "1985",
-                event: "Microsoft lanza Windows 1.0, introduciendo la interfaz gráfica de usuario a las masas."
-            },
-            "12-23": {
-                year: "1947",
-                event: "John Bardeen, Walter Brattain y William Shockley inventan el transistor en Bell Labs, la base de toda la electrónica moderna."
-            }
-        };
-
-        // Función para obtener la fecha actual
+        // Función para obtener la fecha actual formateada
         function getCurrentDate() {
             return new Date().toLocaleDateString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
         }
 
-        // Función para actualizar la hora
+        // Actualiza el reloj cada segundo
         function updateTime() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', { hour12: false });
-            document.getElementById('current-time').textContent = timeString;
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('es-ES', { hour12: false });
         }
 
-        // Función para obtener la efeméride del día
-        function getTodayEphemeris() {
-            const today = new Date();
-            const key = String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                       String(today.getDate()).padStart(2, '0');
-            
-            return ephemerides[key] || {
-                year: "1970",
-                event: "Unix timestamp comienza en este día, estableciendo el 1 de enero de 1970 como punto de referencia para muchos sistemas informáticos."
-            };
-        }
-
-        // Función para crear partículas flotantes
+        // Genera partículas flotantes
         function createParticles() {
             const container = document.getElementById('particles-container');
-            
             setInterval(() => {
-                if (document.querySelectorAll('.particle').length < 15) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
+                if (container.childElementCount < 15) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
                     const size = Math.random() * 4 + 1;
-                    const left = Math.random() * 100;
-                    const animationDuration = Math.random() * 10 + 10;
-                    
-                    particle.style.width = size + 'px';
-                    particle.style.height = size + 'px';
-                    particle.style.left = left + '%';
-                    particle.style.animationDuration = animationDuration + 's';
-                    
-                    container.appendChild(particle);
-                    
-                    setTimeout(() => {
-                        if (container.contains(particle)) {
-                            container.removeChild(particle);
-                        }
-                    }, animationDuration * 1000);
+                    p.style.width = p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDuration = Math.random() * 10 + 10 + 's';
+                    container.appendChild(p);
+                    setTimeout(() => container.removeChild(p), parseFloat(p.style.animationDuration) * 1000);
                 }
             }, 2000);
         }
 
-        // Función para mostrar elementos con retraso
-        function showElementsSequentially() {
+        // Llama al backend para obtener la efeméride generada
+        async function cargarEfemeride() {
+            try {
+                const resp = await fetch('/api/efemerides', { method: 'POST' });
+                const { efemeride } = await resp.json();
+                const [year, ...rest] = efemeride.split(':');
+                document.getElementById('ephemeris-date').textContent = year.trim() + ':';
+                document.getElementById('ephemeris-text').textContent = rest.join(':').trim();
+            } catch (e) {
+                console.error('Error cargando efeméride:', e);
+            }
+        }
+
+        // Muestra elementos secuencialmente y carga efeméride
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            createParticles();
+
             setTimeout(() => {
                 document.getElementById('date-container').style.display = 'block';
                 document.getElementById('current-date').textContent = 'Fecha actual: ' + getCurrentDate();
@@ -330,62 +262,34 @@
 
             setTimeout(() => {
                 document.getElementById('ephemeris-container').style.display = 'block';
-                const ephemeris = getTodayEphemeris();
-                document.getElementById('ephemeris-date').textContent = ephemeris.year + ':';
-                document.getElementById('ephemeris-text').textContent = ephemeris.event;
+                cargarEfemeride();
             }, 5000);
 
-            setTimeout(() => {
-                document.getElementById('final-prompt').style.display = 'flex';
-            }, 6000);
+            setTimeout(() => document.getElementById('final-prompt').style.display = 'flex', 6000);
+            setTimeout(() => document.getElementById('footer').style.display = 'block', 7000);
+            setTimeout(() => document.getElementById('loading').style.display = 'none', 4000);
 
-            setTimeout(() => {
-                document.getElementById('footer').style.display = 'block';
-            }, 7000);
-
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 4000);
-        }
-
-        // Función para copiar texto
-        function setupCopyButton() {
+            // Configura botón de copia usando el contenido mostrado
             document.getElementById('copy-btn').addEventListener('click', async () => {
-                const ephemeris = getTodayEphemeris();
-                const textToCopy = `🖥️ Efeméride de Programación - ${getCurrentDate()}\n\n${ephemeris.year}: ${ephemeris.event}\n\n#Programación #Historia #CodeHistory`;
-                
+                const dateText = document.getElementById('current-date').textContent;
+                const year = document.getElementById('ephemeris-date').textContent;
+                const eventText = document.getElementById('ephemeris-text').textContent;
+                const textToCopy = `🖥️ Efeméride de Programación - ${dateText}\n\n${year} ${eventText}\n\n#Programación #Historia #CodeHistory`;
                 try {
                     await navigator.clipboard.writeText(textToCopy);
-                    
                     const btn = document.getElementById('copy-btn');
-                    const originalContent = btn.innerHTML;
+                    const original = btn.innerHTML;
                     btn.innerHTML = '<span>✅</span><span>Copiado!</span>';
-                    btn.style.background = 'rgba(34, 197, 94, 0.4)';
-                    
-                    setTimeout(() => {
-                        btn.innerHTML = originalContent;
-                        btn.style.background = 'rgba(23, 105, 54, 0.3)';
-                    }, 2000);
+                    setTimeout(() => { btn.innerHTML = original; }, 2000);
                 } catch (err) {
-                    console.error('Error al copiar:', err);
+                    console.error('Error copiando:', err);
                 }
             });
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            updateTime();
-            setInterval(updateTime, 1000);
-            createParticles();
-            showElementsSequentially();
-            setupCopyButton();
         });
 
-        // Prevenir selección accidental pero permitir copia programática
-        document.addEventListener('selectstart', (e) => {
-            if (!e.target.closest('#copy-btn')) {
-                e.preventDefault();
-            }
+        // Previene selección accidental salvo para copiar
+        document.addEventListener('selectstart', e => {
+            if (!e.target.closest('#copy-btn')) e.preventDefault();
         });
     </script>
 </body>

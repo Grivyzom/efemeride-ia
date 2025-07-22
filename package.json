@@ -1,0 +1,26 @@
+{
+  "name": "efemeride-ia",
+  "version": "1.0.0",
+  "description": "Para servir las páginas estáticas con rutas amigables puedes utilizar el\r archivo `.htaccess` incluido en este repositorio. Este archivo redirige las\r URL `/`, `/login` y `/register` a los archivos `index.html`, `login.html` y\r `register.html` respectivamente. Así podrás acceder a las páginas con\r direcciones como `https://localhost:5500/login` sin exponer la extensión\r `.html`.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grivyzom/efemeride-ia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Grivyzom/efemeride-ia/issues"
+  },
+  "homepage": "https://github.com/Grivyzom/efemeride-ia#readme",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0"
+  }
+}

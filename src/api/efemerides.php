@@ -1,1 +1,0 @@
-# Endpoint para obtener efemérides
