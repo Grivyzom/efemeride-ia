@@ -237,18 +237,70 @@
         }
 
         // Llama al backend para obtener la efeméride generada
-        async function cargarEfemeride() {
-            try {
-                const resp = await fetch('/api/efemerides', { method: 'POST' });
-                const { efemeride } = await resp.json();
-                const [year, ...rest] = efemeride.split(':');
-                document.getElementById('ephemeris-date').textContent = year.trim() + ':';
-                document.getElementById('ephemeris-text').textContent = rest.join(':').trim();
-            } catch (e) {
-                console.error('Error cargando efeméride:', e);
+async function cargarEfemeride() {
+    console.log('🔄 Iniciando carga de efeméride...');
+    
+    try {
+        // Mostrar indicador de carga
+        document.getElementById('ephemeris-date').textContent = 'Cargando...';
+        document.getElementById('ephemeris-text').textContent = 'Generando efeméride con IA...';
+        
+        const resp = await fetch('/api/efemerides', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        });
+        
+        console.log('📡 Respuesta del servidor:', resp.status, resp.statusText);
+        
+        if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         }
-
+        
+        const data = await resp.json();
+        console.log('📝 Datos recibidos:', data);
+        
+        const { efemeride, source, error } = data;
+        
+        // Procesar la efeméride
+        if (efemeride) {
+            // Intentar separar año y descripción
+            const parts = efemeride.split(':');
+            if (parts.length >= 2) {
+                const year = parts[0].trim();
+                const description = parts.slice(1).join(':').trim();
+                document.getElementById('ephemeris-date').textContent = year + ':';
+                document.getElementById('ephemeris-text').textContent = description;
+            } else {
+                // Si no tiene el formato esperado, mostrar todo como descripción
+                document.getElementById('ephemeris-date').textContent = 'Dato histórico:';
+                document.getElementById('ephemeris-text').textContent = efemeride;
+            }
+            
+            // Mostrar indicador de fuente en consola
+            console.log(`✅ Efeméride cargada (fuente: ${source || 'unknown'})`);
+            if (error) {
+                console.warn('⚠️ Se usó respaldo debido a:', error);
+            }
+        } else {
+            throw new Error('No se recibió contenido de efeméride');
+        }
+        
+    } catch (e) {
+        console.error('❌ Error cargando efeméride:', e);
+        
+        // Mostrar error en la interfaz
+        document.getElementById('ephemeris-date').textContent = 'ERROR:';
+        document.getElementById('ephemeris-text').textContent = `No se pudo cargar la efeméride. Error: ${e.message}. Revisa la consola para más detalles.`;
+        
+        // También mostrar en consola información de debugging
+        console.log('🔍 Información de debugging:');
+        console.log('- URL actual:', window.location.href);
+        console.log('- Navegador:', navigator.userAgent);
+        console.log('- Fecha:', new Date().toISOString());
+    }
+}
         // Muestra elementos secuencialmente y carga efeméride
         document.addEventListener('DOMContentLoaded', () => {
             updateTime();
