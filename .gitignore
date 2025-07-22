@@ -5,3 +5,5 @@
 .env
 .htaccess
 .env.local
+/.env
+/.htaccess
