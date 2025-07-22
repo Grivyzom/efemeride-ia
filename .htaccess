@@ -1,1 +1,5 @@
-# Configuración servidor Apache
+RewriteEngine On
+RewriteBase /
+RewriteRule ^$ index.html [L]
+RewriteRule ^login/?$ login.html [L]
+RewriteRule ^register/?$ register.html [L]
